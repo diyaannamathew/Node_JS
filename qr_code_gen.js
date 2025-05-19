@@ -1,0 +1,33 @@
+// Importing necessary modules
+import inquirer from 'inquirer';      // For user input
+import qr from 'qr-image';            // For QR code generation
+import fs from 'fs';                  // For file system operations
+
+// Prompting user for input using inquirer
+inquirer
+  .prompt([
+    {
+      message: "Type in your URL: ",
+      name: "URL"
+    }
+  ])
+  .then((answers) => {
+    const url = answers.URL;
+
+    // Generate QR code as PNG and save to file
+    const qr_svg = qr.image(url, { type: 'png' });
+    qr_svg.pipe(fs.createWriteStream('qr_img.png'));
+
+    // Save the URL to a text file
+    fs.writeFile('url.txt', url, (err) => {
+      if (err) throw err;
+      console.log('The file has been saved!');
+    });
+  })
+  .catch((error) => {
+    if (error.isTtyError) {
+      console.error('Prompt could not be rendered in this environment');
+    } else {
+      console.error('An error occurred:', error);
+    }
+  });
